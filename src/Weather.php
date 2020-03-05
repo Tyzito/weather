@@ -11,7 +11,7 @@ class Weather
     protected $key;
     protected $guzzleOptions = [];
 
-    public function __construct(string $key)
+    public function __construct($key)
     {
         $this->key = $key;
     }
@@ -27,9 +27,14 @@ class Weather
     }
 
     // 获取天气
-    public function getWeather($city, string $type = 'base', string $format = 'json')
+    public function getWeather($city, $type = 'live', $format = 'json')
     {
         $url = 'https://restapi.amap.com/v3/weather/weatherInfo';
+
+        $types = [
+            'live' => 'base',
+            'forecast' => 'all',
+        ];
 
         // 1、对 $format 与 $type 参数进行检查，不在范围内抛出异常
 
@@ -37,8 +42,8 @@ class Weather
             throw new InvalidArgumentException('Invalid response format:' . $format);
         }
 
-        if(!in_array(strtolower($type), ['base', 'all'])){
-            throw new InvalidArgumentException('Invalid type value(base/all):' . $type);
+        if(!in_array(strtolower($type), $types)){
+            throw new InvalidArgumentException('Invalid type value(live/forecast):' . $type);
         }
 
         // 2、封装 query 参数，并对空值进行过滤
@@ -67,6 +72,18 @@ class Weather
         }
 
 
+    }
+
+    // 获取实时天气
+    public function getLiveWeather($city, $format = 'json')
+    {
+        return $this->getWeather($city, 'base', $format);
+    }
+
+    // 获取天气预报
+    public function getForecastsWeather($city, $format = 'json')
+    {
+        return $this->getWeather($city, 'all', $format);
     }
 }
 
